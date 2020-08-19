@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from .views import About, Index
+from .views import About, Index, WeatherCity
 
 
 urlpatterns = [
-    path('', Index.as_view(), name="index"),
-    path('about/', About.as_view(), name="about"),
+    path('weather/', WeatherCity.as_view(), name="index"),
+    path('weather/about/', About.as_view(), name="about"),
 ]
