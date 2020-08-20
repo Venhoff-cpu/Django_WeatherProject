@@ -1,6 +1,6 @@
 {%  extends 'WeatherLookup/base.html' %}
 
-{% block title %}City Weather {% endblock %}
+{% block title %}Home Page{% endblock %}
 
 {% block content %}
     <section class="section">
@@ -42,7 +42,9 @@
                                         <span class="title">{{ city }}</span>
                                         <br>
                                         <span class="subtitle">{{ temperature }}° C</span>
-                                        <br> {{ description }}
+                                        <br>
+                                        <span>{{ description }}</span>
+                                        <a href="{%  url 'weather_detail' city_id=city_id %}">Details</a>
                                     </p>
                                 </div>
                             </div>
