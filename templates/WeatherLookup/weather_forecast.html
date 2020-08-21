@@ -1,0 +1,8 @@
+{%  extends 'WeatherLookup/base.html' %}
+
+{% block title %}Detailed Weather info{% endblock %}
+
+{% block content %}
+    <h2>{{ city }}</h2>
+    {{ table|safe }}
+{% endblock %}

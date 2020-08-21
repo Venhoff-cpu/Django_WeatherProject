@@ -10,10 +10,10 @@
     <div class="row">
         <div class="col-sm">
             <h3>Temperature</h3>
-            <p>Current temperature - {{ temperature }} °C</p>
-            <p>Max. temperature - {{ temp_max }} °C</p>
-            <p>Min. temperature - {{ temp_min }} °C</p>
-            <p>Sensed temperature - {{ temp_fell }} °C </p>
+            <p>Current temperature: {{ temperature }} °C</p>
+            <p>Max. temperature: {{ temp_max }} °C</p>
+            <p>Min. temperature: {{ temp_min }} °C</p>
+            <p>Sensed temperature: {{ temp_fell }} °C </p>
         </div>
         <div class="col-sm">
             <h3>Pressure</h3>
@@ -48,5 +48,6 @@
         <p>There has been no snowfall in the last 3 hours</p>
         {% endif %}
     </div>
+    <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
 </div>
 {% endblock %}
