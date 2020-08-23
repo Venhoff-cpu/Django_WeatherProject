@@ -43,18 +43,30 @@
             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        {% if user.is_authenticated %}
+        <span style="color: white; margin: 5px">Welcome, {{ user }}!</span>
+        <form class="form-inline my-2 my-lg-0" method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
         </form>
+        {% else %}
+        <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'register' %}">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign up</button>
+        </form>
+        <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'login' %}">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign in</button>
+        </form>
+        {% endif %}
       </div>
     </nav>
     <br>
-    {% block content %}{% endblock %}
-    <footer class="footer">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer" style="display: flex">
         <div class="container">
             <span>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</span>
-            <span>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ ver }}</span>
+            <span>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}</span>
             Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>
             Github: <a href="https://github.com/Venhoff-cpu">link</a>
         </div>

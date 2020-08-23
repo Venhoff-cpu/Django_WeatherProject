@@ -1,7 +1,12 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, FormView, View
-from .forms import CityForm
+from django.contrib.auth import login, authenticate, logout
+from .forms import CityForm, CreateUserForm, ChangePasswordForm
+from django.contrib import messages
 from .api_processor import api_current_ctx_processor, api_forecast_processor, fetch_current_data, fetch_forecast_data, \
     get_city_name
 
@@ -53,3 +58,61 @@ class WeatherForcast(TemplateView):
             ctx['city'] = city_name
             ctx['table'] = api_forecast_processor(data).to_html(index=False, classes='table')
         return ctx
+
+
+class RegisterView(FormView):
+    template_name = "WeatherLookup/register.html"
+    form_class = CreateUserForm
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
+class LoginView(FormView):
+    form_class = AuthenticationForm
+    template_name = "WeatherLookup/login.html"
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username,
+                            password=password)
+        if user is not None:
+            login(self.request, user)
+        else:
+            messages.info()
+            return redirect(reverse_lazy('login'))
+        return redirect(reverse_lazy('index'))
+
+
+class LogoutView(View):
+
+    def post(self, request):
+        logout(request)
+        return redirect(reverse_lazy('index'))
+
+
+class ChangePasswordView(FormView):
+    permission_required = 'auth.change_user'
+
+    form_class = ChangePasswordForm
+    fields = "__all__"
+    template_name = "exercises/change_password.html"
+
+    def get_context_data(self):
+        ctx = super().get_context_data()
+        password_owner = get_object_or_404(User, pk=self.kwargs.get("user_id"))
+        ctx.update({"password_owner": password_owner})
+        return ctx
+
+    def form_valid(self, form):
+        user = get_object_or_404(User, pk=self.kwargs.get("user_id"))
+        if user is not None:
+            user.set_password(form.cleaned_data["password1"])
+            user.save()
+        else:
+            return HttpResponse("Błąd resetowania")
+
+        return redirect(reverse_lazy('index'))
