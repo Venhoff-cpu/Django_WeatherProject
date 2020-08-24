@@ -16,9 +16,9 @@
             <p>Sensed temperature: {{ temp_fell }} °C </p>
         </div>
         <div class="col-sm">
-            <h3>Pressure</h3>
+            <h3>Pressure</h3><br>
             <p>{{ pressure }} hPa</p>
-            <h3>Humidity</h3>
+            <h3>Humidity</h3><br>
             <p>{{ humidity }} %</p>
         </div>
         <div class="col-sm">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <br>
-    <div>
+    <div class="row">
         <h3>Precipitation</h3>
         {% if rain_1h or rain_3h %}
         <p>Last hour - {{ rain_1h }} mm</p>

@@ -1,0 +1,29 @@
+{%  extends 'WeatherLookup/base.html' %}
+
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+    {% if user.is_authenticated %}
+        <h4>Welcome to your profile page '{{ user.username }}'</h4>
+        <div class="row">
+            <div class="col-sm">
+                <h5>Personal info
+                    <a href="{% url 'profile_info_change' user_id=user.id %}">(Change info)</a>
+                </h5>
+                <p>First name: {{ user.first_name }}</p>
+                <p>Last name: {{ user.last_name }}</p>
+                <p>Email address: {{ user.email }}</p>
+                <a href="{% url 'profile_pass_change'  user_id=user.id %}" class="button">Change Password</a>
+            </div>
+        </div>
+    {% else %}
+        <p>Sorry, you have to be loged in to view this page -
+            <a href="{% url 'login' %}">Sign in</a>
+        </p>
+        <p>Doesn't have an account? Consider
+            <a href="{% url 'register' %}">signing up.</a>
+        </p>
+    {% endif %}
+    </div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.forms import ModelForm, TextInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.forms.widgets import EmailInput
 from django import forms
 from .models import City
 
@@ -29,10 +30,24 @@ class CreateUserForm(UserCreationForm):
 
 
 class ChangePasswordForm(forms.Form):
-    password_1 = forms.CharField(widget=forms.PasswordInput)
-    password_2 = forms.CharField(widget=forms.PasswordInput, help_text="Repeat password")
+    password1 = forms.CharField(widget=forms.PasswordInput, label='New Password')
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Repeat password")
 
     def clean(self):
         if self.data['password1'] != self.data['password2']:
-            self.add_error(None, error='Hasła nie pasują do siebie')
+            self.add_error(None, error='Passwords need to be identical')
         return super().clean()
+
+
+class ChangeProfileForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+        widgets = {
+            'email': EmailInput(),
+        }
+        labels = {
+            'first_name': 'First name',
+            'last_name': 'Last name',
+            'email': 'Email address',
+        }

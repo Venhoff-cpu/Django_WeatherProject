@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, FormView, View
+from django.views.generic import TemplateView, FormView, View, UpdateView
 from django.contrib.auth import login, authenticate, logout
-from .forms import CityForm, CreateUserForm, ChangePasswordForm
+from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm
 from django.contrib import messages
 from .api_processor import api_current_ctx_processor, api_forecast_processor, fetch_current_data, fetch_forecast_data, \
     get_city_name
@@ -73,6 +73,7 @@ class RegisterView(FormView):
 class LoginView(FormView):
     form_class = AuthenticationForm
     template_name = "WeatherLookup/login.html"
+    success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         username = form.cleaned_data.get('username')
@@ -82,9 +83,9 @@ class LoginView(FormView):
         if user is not None:
             login(self.request, user)
         else:
-            messages.info()
+            messages.info(self.request, 'Incorrect username or password.')
             return redirect(reverse_lazy('login'))
-        return redirect(reverse_lazy('index'))
+        return super().form_valid(form)
 
 
 class LogoutView(View):
@@ -94,25 +95,42 @@ class LogoutView(View):
         return redirect(reverse_lazy('index'))
 
 
-class ChangePasswordView(FormView):
-    permission_required = 'auth.change_user'
+class ProfileView(TemplateView):
+    template_name = 'WeatherLookup/profile.html'
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data()
+        user = get_object_or_404(User, pk=self.request.user.id)
+        ctx.update({'user': user})
+        return ctx
+
+
+class ChangeProfileView(UpdateView):
+    form_class = ChangeProfileForm
+    success_url = reverse_lazy('profile')
+    template_name = 'WeatherLookup/change_info.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the error below.')
+        return super().form_invalid(form)
+
+
+class ChangePasswordView(FormView):
     form_class = ChangePasswordForm
     fields = "__all__"
-    template_name = "exercises/change_password.html"
-
-    def get_context_data(self):
-        ctx = super().get_context_data()
-        password_owner = get_object_or_404(User, pk=self.kwargs.get("user_id"))
-        ctx.update({"password_owner": password_owner})
-        return ctx
+    template_name = "WeatherLookup/change_pass.html"
 
     def form_valid(self, form):
         user = get_object_or_404(User, pk=self.kwargs.get("user_id"))
         if user is not None:
             user.set_password(form.cleaned_data["password1"])
             user.save()
+            messages.success(self.request, 'Password changed successfully.')
         else:
-            return HttpResponse("Błąd resetowania")
+            messages.success(self.request, 'Something went wrong.')
+            return redirect(reverse_lazy('profile_pass_change', kwargs={'user_id': self.request.user.id}))
 
         return redirect(reverse_lazy('index'))

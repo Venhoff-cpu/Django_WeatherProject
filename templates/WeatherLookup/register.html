@@ -4,7 +4,7 @@
 
 {% block content %}
 <h3>Register</h3>
-    <form method="POST" action="" class="form-group">
+    <form method="POST" class="form-group">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">

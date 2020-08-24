@@ -1,0 +1,21 @@
+{%  extends 'WeatherLookup/base.html' %}
+{% block title %}Password change{% endblock %}
+{% block content %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            {{ form }}
+            {% if form.errors %}
+                <ol>
+                    {% for error in form.subject.errors %}
+                    <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </table>
+        <input type="submit" value="Change Password">
+    </form>
+</div>
+
+{% endblock %}
