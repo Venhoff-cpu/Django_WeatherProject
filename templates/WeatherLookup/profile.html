@@ -6,8 +6,42 @@
     <div class="container">
     {% if user.is_authenticated %}
         <h4>Welcome to your hub '{{ user.username }}'</h4>
-
-
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column is-offset-4 is-4">
+                        {% for city in cities %}
+                        <div class="box">
+                            <article class="media">
+                                <div class="media-left">
+                                    <figure class="image is-50x50">
+                                        <img src="http://openweathermap.org/img/w/{{ city.icon }}.png" alt="Image">
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div class="content">
+                                        <p>
+                                            <span class="title">{{ city.name }}</span>
+                                            <br>
+                                            <span class="subtitle">{{ city.temperature }}° C</span>
+                                            <br>
+                                            <span>{{ city.description }}</span>
+                                            <a href="{% url 'weather_detail' city.city_id %}">Details</a>
+                                            <a href="{% url 'weather_forecast' city.city_id %}">5 day forecast</a>
+                                            <form method="POST" action="#">
+                                                {% csrf_token %}
+                                                <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Delete">
+                                            </form>
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
     {% else %}
         <p>Sorry, you have to be logged in to view this page -
             <a href="{% url 'login' %}">Sign in</a>

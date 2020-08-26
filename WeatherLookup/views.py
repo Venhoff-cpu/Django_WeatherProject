@@ -69,16 +69,20 @@ class AddToFavorite(LoginRequiredMixin, View):
     def post(self, request, city_id):
         user = get_object_or_404(User, pk=request.user.id)
         city_data = fetch_current_data(city_id)
-        city = City.objects.add(
+        city, created = City.objects.get_or_create(
             name=city_data['name'],
             city_id=city_data['id'],
             lon=city_data['coord']['lon'],
             lat=city_data['coord']['lat'],
             user=user,
         )
-        city.save()
-        messages.error(request, f'{city} added to observed')
-        return redirect()
+        if created:
+            city.save()
+            messages.error(request, f'{city} added to observed')
+        else:
+            messages.error(request, f'{city} already observed')
+            return redirect(reverse_lazy('index'))
+        return redirect(reverse_lazy('profile'))
 
 
 class RegisterView(FormView):
@@ -130,6 +134,21 @@ class ProfileMixin(LoginRequiredMixin, ContextMixin):
 
 class ProfileView(ProfileMixin, TemplateView):
     template_name = 'WeatherLookup/profile.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data()
+        user = get_object_or_404(User, pk=self.request.user.id)
+        cities_query = City.objects.filter(user=user.id)
+        cities = []
+        for city in cities_query:
+            city_data = fetch_current_data(city.city_id)
+            city_ctx = api_current_ctx_processor(city_data)
+            cities.append(city_ctx)
+        ctx.update({
+            'user': user,
+            'cities': cities,
+        })
+        return ctx
 
 
 class ProfileDetailView(ProfileMixin, TemplateView):
