@@ -44,7 +44,13 @@
                                         <span class="subtitle">{{ temperature }}° C</span>
                                         <br>
                                         <span>{{ description }}</span>
-                                        <a href="{%  url 'weather_detail' city_id=city_id %}">Details</a>
+                                        <a href="{% url 'weather_detail' city.id %}">Details</a>
+                                        <a href="{% url 'weather_forecast' city.id %}">5 day forecast</a>
+                                        {% if user.is_authenticated %}
+                                            <form method="POST" action="{% url 'add_fav' city.id %}">
+                                            <a href="">Observe</a>
+                                            </form>
+                                        {% endif %}
                                     </p>
                                 </div>
                             </div>

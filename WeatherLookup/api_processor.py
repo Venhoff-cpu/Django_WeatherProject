@@ -30,6 +30,11 @@ def fetch_forecast_data(lat, lon):
 
 
 def api_current_ctx_processor(data):
+    """
+    Extraction of json data - current weather
+    :param data: API response from OpeanWeathermap.org in json fomat
+    :return: Dictionary of lists
+    """
     ctx = {}
     ctx['city'] = data['name']
     ctx['city_id'] = data['id']
@@ -99,8 +104,6 @@ def api_forecast_processor(data):
     df_ctx['snowfall'] = ctx['snowfall']
 
     return df_ctx
-
-
 
 
 def get_city_name(data):

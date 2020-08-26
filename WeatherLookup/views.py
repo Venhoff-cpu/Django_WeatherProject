@@ -1,12 +1,15 @@
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, FormView, View, UpdateView
 from django.contrib.auth import login, authenticate, logout
-from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm
 from django.contrib import messages
+from django.views.generic.base import ContextMixin
+
+from .models import City
+from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm
 from .api_processor import api_current_ctx_processor, api_forecast_processor, fetch_current_data, fetch_forecast_data, \
     get_city_name
 
@@ -60,6 +63,24 @@ class WeatherForcast(TemplateView):
         return ctx
 
 
+class AddToFavorite(LoginRequiredMixin, View):
+    login_url = reverse_lazy('login')
+
+    def post(self, request, city_id):
+        user = get_object_or_404(User, pk=request.user.id)
+        city_data = fetch_current_data(city_id)
+        city = City.objects.add(
+            name=city_data['name'],
+            city_id=city_data['id'],
+            lon=city_data['coord']['lon'],
+            lat=city_data['coord']['lat'],
+            user=user,
+        )
+        city.save()
+        messages.error(request, f'{city} added to observed')
+        return redirect()
+
+
 class RegisterView(FormView):
     template_name = "WeatherLookup/register.html"
     form_class = CreateUserForm
@@ -88,15 +109,17 @@ class LoginView(FormView):
         return super().form_valid(form)
 
 
-class LogoutView(View):
+class LogoutView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('login')
 
     def post(self, request):
         logout(request)
+        messages.info(request, 'You have been logged out.')
         return redirect(reverse_lazy('index'))
 
 
-class ProfileView(TemplateView):
-    template_name = 'WeatherLookup/profile.html'
+class ProfileMixin(LoginRequiredMixin, ContextMixin):
+    login_url = reverse_lazy('login')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
@@ -105,7 +128,16 @@ class ProfileView(TemplateView):
         return ctx
 
 
-class ChangeProfileView(UpdateView):
+class ProfileView(ProfileMixin, TemplateView):
+    template_name = 'WeatherLookup/profile.html'
+
+
+class ProfileDetailView(ProfileMixin, TemplateView):
+    template_name = 'WeatherLookup/profile_personal.html'
+
+
+class ChangeProfileView(LoginRequiredMixin, UpdateView):
+    login_url = reverse_lazy('login')
     form_class = ChangeProfileForm
     success_url = reverse_lazy('profile')
     template_name = 'WeatherLookup/change_info.html'
@@ -118,7 +150,8 @@ class ChangeProfileView(UpdateView):
         return super().form_invalid(form)
 
 
-class ChangePasswordView(FormView):
+class ChangePasswordView(LoginRequiredMixin, FormView):
+    login_url = reverse_lazy('login')
     form_class = ChangePasswordForm
     fields = "__all__"
     template_name = "WeatherLookup/change_pass.html"
@@ -134,3 +167,4 @@ class ChangePasswordView(FormView):
             return redirect(reverse_lazy('profile_pass_change', kwargs={'user_id': self.request.user.id}))
 
         return redirect(reverse_lazy('index'))
+
