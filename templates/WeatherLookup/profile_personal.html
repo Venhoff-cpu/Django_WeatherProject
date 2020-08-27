@@ -15,6 +15,7 @@
                 <p>Last name: {{ user.last_name }}</p>
                 <p>Email address: {{ user.email }}</p>
                 <a href="{% url 'profile_pass_change'  user_id=user.id %}" class="button">Change Password</a>
+                <a class="btn btn-primary-custom" href="{% url 'disable_acc' %}">Delete account</a>
             </div>
         </div>
     {% else %}

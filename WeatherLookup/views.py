@@ -3,13 +3,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, FormView, View, UpdateView
+from django.views.generic import TemplateView, FormView, View, UpdateView, DeleteView
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
 from .models import City
-from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm
+from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm, DeleteProfileForm
 from .api_processor import api_current_ctx_processor, api_forecast_processor, fetch_current_data, fetch_forecast_data, \
     get_city_name
 
@@ -82,6 +82,15 @@ class AddToFavorite(LoginRequiredMixin, View):
         else:
             messages.error(request, f'{city} already observed')
             return redirect(reverse_lazy('index'))
+        return redirect(reverse_lazy('profile'))
+
+
+class DeleteFromFav(LoginRequiredMixin, View):
+    login_url = reverse_lazy('login')
+
+    def post(self, request, city_id):
+        city = get_object_or_404(City, city_id=city_id, user=request.user.id)
+        city.delete()
         return redirect(reverse_lazy('profile'))
 
 
@@ -187,3 +196,15 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
 
         return redirect(reverse_lazy('index'))
 
+
+class DeleteAccountView(LoginRequiredMixin, FormView):
+    login_url = reverse_lazy('login')
+    form_class = DeleteProfileForm
+    template_name = 'WeatherLookup/profile_delete.html'
+
+    def form_valid(self, form):
+        user = self.request.user
+        user.is_active = False
+        user.save()
+        messages.success(self.request, 'Profile successfully disabled.')
+        return redirect(reverse_lazy('index'))

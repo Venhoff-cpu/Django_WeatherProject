@@ -15,8 +15,11 @@ class CityForm(ModelForm):
 
 class CreateUserForm(UserCreationForm):
     def clean_username(self):
-        if User.objects.filter(username=self.data['username']).exists():
+        if User.objects.filter(username=self.data['username'], is_active=True).exists():
             self.add_error('username', error='Username already in use')
+        elif User.objects.filter(username=self.data['username'], is_active=False).exists():
+            user = User.objects.get(username=self.data['username'])
+            user.is_active = True
         return self.data['username']
 
     def clean(self):
@@ -51,3 +54,9 @@ class ChangeProfileForm(ModelForm):
             'last_name': 'Last name',
             'email': 'Email address',
         }
+
+
+class DeleteProfileForm(ModelForm):
+    class Meta:
+        model = User
+        fields = []

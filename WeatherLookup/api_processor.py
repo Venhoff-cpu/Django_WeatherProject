@@ -49,10 +49,12 @@ def api_current_ctx_processor(data):
     ctx['clouds'] = data['clouds']['all'] # presented in %
     if 'rain' in data:
         ctx['rain_1h'] = data['rain']['1h']
-        ctx['rain_3h'] = data['rain']['3h']
+        if '3h' in data['rain']:
+            ctx['rain_3h'] = data['rain']['3h']
     if 'snow' in data:
         ctx['snow_1h'] = data['snow']['1h']
-        ctx['snow_3h'] = data['snow']['3h']
+        if '3h' in data['snow']:
+            ctx['snow_3h'] = data['snow']['3h']
     ctx['description'] = data['weather'][0]['description']
     ctx['sunrise'] = data['sys']['sunrise']
     ctx['sunset'] = data['sys']['sunset']
