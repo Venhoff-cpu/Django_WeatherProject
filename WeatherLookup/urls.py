@@ -20,7 +20,7 @@ from .views import (
 
 
 urlpatterns = [
-    path("weather/", WeatherCurrent.as_view(), name="index"),
+    path("", WeatherCurrent.as_view(), name="index"),
     path("weather/register/", RegisterView.as_view(), name="register"),
     path("weeather/login/", LoginView.as_view(), name="login"),
     path("weether/logout/", LogoutView.as_view(), name="logout"),

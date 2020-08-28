@@ -5,8 +5,8 @@
 {% block content %}
 <div class="container">
     <img src="http://openweathermap.org/img/w/{{ icon }}.png" alt="Image">
-    <h2>{{ city }}</h2>
-    <span>{{ description }}</span>
+    <h2>{{ city_name }}</h2>
+    <h4>Current condition: {{ description }}</h4>
     <div class="row">
         <div class="col-sm">
             <h3>Temperature</h3>
@@ -16,9 +16,9 @@
             <p>Sensed temperature: {{ temp_fell }} °C </p>
         </div>
         <div class="col-sm">
-            <h3>Pressure</h3><br>
+            <h3>Pressure</h3>
             <p>{{ pressure }} hPa</p>
-            <h3>Humidity</h3><br>
+            <h3>Humidity</h3>
             <p>{{ humidity }} %</p>
         </div>
         <div class="col-sm">
@@ -33,20 +33,24 @@
     </div>
     <br>
     <div class="row">
-        <h3>Precipitation</h3>
+        <div class="cols-sm">
+            <h3>Precipitation</h3>
         {% if rain_1h or rain_3h %}
-        <p>Last hour - {{ rain_1h }} mm</p>
-        <p>Last 3h - {{ rain_3h }} mm</p>
+            <p>Last hour - {{ rain_1h }} mm</p>
+            <p>Last 3h - {{ rain_3h }} mm</p>
         {% else %}
-        <p>There has been no rainfall in the last 3 hours</p>
+            <p>There has been no rainfall in the last 3 hours</p>
         {% endif %}
-        <h3>Snow fall</h3>
+        </div>
+        <div class="col-sm">
+            <h3>Snow fall</h3>
         {% if snow_1h or snow_3h %}
-        <p>Last hour - {{ rain_1h }} mm</p>
-        <p>Last 3h - {{ rain_3h }} mm</p>
+            <p>Last hour - {{ rain_1h }} mm</p>
+            <p>Last 3h - {{ rain_3h }} mm</p>
         {% else %}
-        <p>There has been no snowfall in the last 3 hours</p>
+            <p>There has been no snowfall in the last 3 hours</p>
         {% endif %}
+        </div>
     </div>
     <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
 </div>

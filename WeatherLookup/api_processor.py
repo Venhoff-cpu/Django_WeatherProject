@@ -9,16 +9,16 @@ api_current_url = (
     "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}"
 )
 api_current_url_id = (
-    " https://api.openweathermap.org/data/2.5/weather?id={}&units=metric&" "appid={}"
+    " https://api.openweathermap.org/data/2.5/weather?id={}&units=metric&appid={}"
 )
 api_forecast_url_id = (
-    "api.openweathermap.org/data/2.5/forecast?id={}$units=metric&appid={} "
+    "api.openweathermap.org/data/2.5/forecast?id={}$units=metric&appid={}"
 )
 
 
 # oneshot api call takes parameters longtitude(lon) and latitude(lat) - used for 5 day forecast
 forecast_api_url = (
-    "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&units=metric$lang=pl&"
+    "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&units=metric&lang=en&"
     "exclude=current,minutely,hourly&appid={}"
 )
 
@@ -44,7 +44,7 @@ def api_current_ctx_processor(data):
     :return: Dictionary of lists
     """
     ctx = {}
-    ctx["city"] = data["name"]
+    ctx["city_name"] = data["name"]
     ctx["city_id"] = data["id"]
     ctx["temperature"] = data["main"]["temp"]
     ctx["temp_max"] = data["main"]["temp_max"]
@@ -103,15 +103,15 @@ def api_forecast_processor(data):
     df_ctx["date"] = ctx["date"]
     df_ctx["temp_day"] = ctx["temp_day"]
     df_ctx["temp_night"] = ctx["temp_night"]
-    df_ctx["pressure"] = ctx["pressure"]
-    df_ctx["humidity"] = ctx["humidity"]
-    df_ctx["weather_description"] = ctx["weather_description"]
-    df_ctx["clouds"] = ctx["clouds"]
-    df_ctx["wind_speed_prediction"] = ctx["wind_speed_prediction"]
-    df_ctx["wind_degree_prediction"] = ctx["wind_degree_prediction"]
-    df_ctx["pop_chance"] = ctx["pop_chance"]
-    df_ctx["rainfall"] = ctx["rainfall"]
-    df_ctx["snowfall"] = ctx["snowfall"]
+    df_ctx["Pressure"] = ctx["pressure"]
+    df_ctx["Humidity"] = ctx["humidity"]
+    df_ctx["Description"] = ctx["weather_description"]
+    df_ctx["Cloudiness"] = ctx["clouds"]
+    df_ctx["Wind speed"] = ctx["wind_speed_prediction"]
+    df_ctx["Wind direction"] = ctx["wind_degree_prediction"]
+    df_ctx["Chance of precipitation"] = ctx["pop_chance"]
+    df_ctx["Rainfall"] = ctx["rainfall"]
+    df_ctx["Snowfall"] = ctx["snowfall"]
 
     return df_ctx
 
@@ -119,7 +119,7 @@ def api_forecast_processor(data):
 def get_city_name(data):
     """
     Function to extract only the name of the city.
-    :param data: API response from fecth_current_data
+    :param data: API response from fetch_current_data
     :return: City name
     """
     return data["name"]

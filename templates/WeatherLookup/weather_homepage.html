@@ -10,21 +10,17 @@
                     <form method="POST" action="">
                         {% csrf_token %}
                         <div class="field has-addons">
-                            <div class="control is-expanded">
-                                {{ form.name }}
-                            </div>
-                            <div class="control">
-                                <button type="submit" class="button is-info">
+                            {{ form.name }}
+                            <button type="submit" class="button is-info">
                                     Find a city
-                                </button>
-                            </div>
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </section>
-    {% if city %}
+    {% if city_name %}
     <section class="section">
         <div class="container">
             <div class="columns">
@@ -39,18 +35,26 @@
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <span class="title">{{ city }}</span>
+                                        <span class="title">{{ city_name }}</span>
                                         <br>
                                         <span class="subtitle">{{ temperature }}° C</span>
                                         <br>
-                                        <span>{{ description }}</span>
-                                        <a href="{% url 'weather_detail' city_id=city_id %}">Details</a>
+                                        <span>{{ description }}</span><br>
+                                        <a href="{% url 'weather_detail' city_id=city_id %}">Details</a><br>
                                         <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
                                         {% if user.is_authenticated %}
-                                            <form method="POST" action="{% url 'add_fav' city_id=city_id %}">
-                                            {% csrf_token %}
-                                                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Observe</button>
-                                            </form>
+                                            {% if city_name in fav_cities %}
+                                                <form method="POST" action="{% url 'del_fav' city_id=city_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="submit" class="btn btn-outline-danger my-2 my-sm-0"
+                                                           value="Delete from observed">
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" action="{% url 'add_fav' city_id=city_id %}">
+                                                {% csrf_token %}
+                                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Observe</button>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </p>
                                 </div>

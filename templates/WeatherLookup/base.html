@@ -22,12 +22,6 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'about' %}">About me</a>
-          </li>
           {% if user.is_authenticated %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -39,6 +33,9 @@
             </div>
           </li>
           {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About app</a>
+          </li>
         </ul>
         {% if user.is_authenticated %}
         <span style="color: white; margin: 5px">Welcome, {{ user }}!</span>
@@ -66,12 +63,10 @@
     {% endif %}
     {% block content %}{% endblock %}
     <footer class="footer" style="display: flex">
-        <div class="container">
-            <span>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</span>
-            <span>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}</span>
-            Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>
-            Github: <a href="https://github.com/Venhoff-cpu">link</a>
-        </div>
+        <p>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</p>
+        <p>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}.</p>
+        Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>.
+        Github: <a href="https://github.com/Venhoff-cpu">link</a>.
     </footer>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -38,11 +38,18 @@ class WeatherCurrent(FormView):
     form_class = CityForm
 
     def form_valid(self, form):
+        ctx = {}
         city = form.cleaned_data.get("name")
         data = fetch_current_data(city)
         if data:
             ctx = api_current_ctx_processor(data)
-        ctx["form"] = form
+        else:
+            messages.info(self.request, "Incorrect city name. Try again")
+        user = self.request.user
+        if not user.is_anonymous:
+            fav_cities = [city.name for city in City.objects.filter(user=user)]
+            ctx['fav_cities'] = fav_cities
+        ctx['form'] = form
         return render(self.request, "WeatherLookup/weather_homepage.html", ctx)
 
 
