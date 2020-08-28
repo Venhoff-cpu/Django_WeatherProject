@@ -1,9 +1,10 @@
 import requests
 import collections
 from .utils import unix_to_datetime
+from Django_WeatherProject.local_settings import api_key
 import pandas as pd
 
-api_key = "a39f896edf10d5de6c18cb86f3ab69aa"
+
 api_current_url = (
     "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid={}"
 )
