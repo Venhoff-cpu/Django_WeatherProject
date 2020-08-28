@@ -13,5 +13,5 @@ class City(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = 'cities'
-        unique_together = ('city_id', 'user')
+        verbose_name_plural = "cities"
+        unique_together = ("city_id", "user")

@@ -3,15 +3,26 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, FormView, View, UpdateView, DeleteView
+from django.views.generic import TemplateView, FormView, View, UpdateView
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
 from .models import City
-from .forms import CityForm, CreateUserForm, ChangePasswordForm, ChangeProfileForm, DeleteProfileForm
-from .api_processor import api_current_ctx_processor, api_forecast_processor, fetch_current_data, fetch_forecast_data, \
-    get_city_name
+from .forms import (
+    CityForm,
+    CreateUserForm,
+    ChangePasswordForm,
+    ChangeProfileForm,
+    DeleteProfileForm,
+)
+from .api_processor import (
+    api_current_ctx_processor,
+    api_forecast_processor,
+    fetch_current_data,
+    fetch_forecast_data,
+    get_city_name,
+)
 
 
 class Index(TemplateView):
@@ -27,19 +38,19 @@ class WeatherCurrent(FormView):
     form_class = CityForm
 
     def form_valid(self, form):
-        city = form.cleaned_data.get('name')
+        city = form.cleaned_data.get("name")
         data = fetch_current_data(city)
         if data:
             ctx = api_current_ctx_processor(data)
-        ctx['form'] = form
+        ctx["form"] = form
         return render(self.request, "WeatherLookup/weather_homepage.html", ctx)
 
 
 class WeatherDetail(TemplateView):
-    template_name = 'WeatherLookup/weather_detail.html'
+    template_name = "WeatherLookup/weather_detail.html"
 
     def get_context_data(self, **kwargs):
-        city_id = kwargs['city_id']
+        city_id = kwargs["city_id"]
         data = fetch_current_data(city_id)
         if data:
             ctx = api_current_ctx_processor(data)
@@ -47,57 +58,59 @@ class WeatherDetail(TemplateView):
 
 
 class WeatherForcast(TemplateView):
-    template_name = 'WeatherLookup/weather_forecast.html'
+    template_name = "WeatherLookup/weather_forecast.html"
 
     def get_context_data(self, **kwargs):
         ctx = {}
-        city_id = kwargs['city_id']
+        city_id = kwargs["city_id"]
         temp_data = fetch_current_data(city_id)
-        lon = temp_data['coord']['lon']
-        lat = temp_data['coord']['lat']
+        lon = temp_data["coord"]["lon"]
+        lat = temp_data["coord"]["lat"]
         data = fetch_forecast_data(lat, lon)
         if data:
             city_name = get_city_name(temp_data)
-            ctx['city'] = city_name
-            ctx['table'] = api_forecast_processor(data).to_html(index=False, classes='table')
+            ctx["city"] = city_name
+            ctx["table"] = api_forecast_processor(data).to_html(
+                index=False, classes="table"
+            )
         return ctx
 
 
 class AddToFavorite(LoginRequiredMixin, View):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
 
     def post(self, request, city_id):
         user = get_object_or_404(User, pk=request.user.id)
         city_data = fetch_current_data(city_id)
         city, created = City.objects.get_or_create(
-            name=city_data['name'],
-            city_id=city_data['id'],
-            lon=city_data['coord']['lon'],
-            lat=city_data['coord']['lat'],
+            name=city_data["name"],
+            city_id=city_data["id"],
+            lon=city_data["coord"]["lon"],
+            lat=city_data["coord"]["lat"],
             user=user,
         )
         if created:
             city.save()
-            messages.error(request, f'{city} added to observed')
+            messages.error(request, f"{city} added to observed")
         else:
-            messages.error(request, f'{city} already observed')
-            return redirect(reverse_lazy('index'))
-        return redirect(reverse_lazy('profile'))
+            messages.error(request, f"{city} already observed")
+            return redirect(reverse_lazy("index"))
+        return redirect(reverse_lazy("profile"))
 
 
 class DeleteFromFav(LoginRequiredMixin, View):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
 
     def post(self, request, city_id):
         city = get_object_or_404(City, city_id=city_id, user=request.user.id)
         city.delete()
-        return redirect(reverse_lazy('profile'))
+        return redirect(reverse_lazy("profile"))
 
 
 class RegisterView(FormView):
     template_name = "WeatherLookup/register.html"
     form_class = CreateUserForm
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy("login")
 
     def form_valid(self, form):
         form.save()
@@ -107,42 +120,41 @@ class RegisterView(FormView):
 class LoginView(FormView):
     form_class = AuthenticationForm
     template_name = "WeatherLookup/login.html"
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy("profile")
 
     def form_valid(self, form):
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password')
-        user = authenticate(username=username,
-                            password=password)
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password")
+        user = authenticate(username=username, password=password)
         if user is not None:
             login(self.request, user)
         else:
-            messages.info(self.request, 'Incorrect username or password.')
-            return redirect(reverse_lazy('login'))
+            messages.info(self.request, "Incorrect username or password.")
+            return redirect(reverse_lazy("login"))
         return super().form_valid(form)
 
 
 class LogoutView(LoginRequiredMixin, View):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
 
     def post(self, request):
         logout(request)
-        messages.info(request, 'You have been logged out.')
-        return redirect(reverse_lazy('index'))
+        messages.info(request, "You have been logged out.")
+        return redirect(reverse_lazy("index"))
 
 
 class ProfileMixin(LoginRequiredMixin, ContextMixin):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
         user = get_object_or_404(User, pk=self.request.user.id)
-        ctx.update({'user': user})
+        ctx.update({"user": user})
         return ctx
 
 
 class ProfileView(ProfileMixin, TemplateView):
-    template_name = 'WeatherLookup/profile.html'
+    template_name = "WeatherLookup/profile.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
@@ -153,33 +165,35 @@ class ProfileView(ProfileMixin, TemplateView):
             city_data = fetch_current_data(city.city_id)
             city_ctx = api_current_ctx_processor(city_data)
             cities.append(city_ctx)
-        ctx.update({
-            'user': user,
-            'cities': cities,
-        })
+        ctx.update(
+            {
+                "user": user,
+                "cities": cities,
+            }
+        )
         return ctx
 
 
 class ProfileDetailView(ProfileMixin, TemplateView):
-    template_name = 'WeatherLookup/profile_personal.html'
+    template_name = "WeatherLookup/profile_personal.html"
 
 
 class ChangeProfileView(LoginRequiredMixin, UpdateView):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
     form_class = ChangeProfileForm
-    success_url = reverse_lazy('profile')
-    template_name = 'WeatherLookup/change_info.html'
+    success_url = reverse_lazy("profile")
+    template_name = "WeatherLookup/change_info.html"
 
     def get_object(self, queryset=None):
         return self.request.user
 
     def form_invalid(self, form):
-        messages.error(self.request, 'Please correct the error below.')
+        messages.error(self.request, "Please correct the error below.")
         return super().form_invalid(form)
 
 
 class ChangePasswordView(LoginRequiredMixin, FormView):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
     form_class = ChangePasswordForm
     fields = "__all__"
     template_name = "WeatherLookup/change_pass.html"
@@ -189,22 +203,26 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
         if user is not None:
             user.set_password(form.cleaned_data["password1"])
             user.save()
-            messages.success(self.request, 'Password changed successfully.')
+            messages.success(self.request, "Password changed successfully.")
         else:
-            messages.success(self.request, 'Something went wrong.')
-            return redirect(reverse_lazy('profile_pass_change', kwargs={'user_id': self.request.user.id}))
+            messages.success(self.request, "Something went wrong.")
+            return redirect(
+                reverse_lazy(
+                    "profile_pass_change", kwargs={"user_id": self.request.user.id}
+                )
+            )
 
-        return redirect(reverse_lazy('index'))
+        return redirect(reverse_lazy("index"))
 
 
 class DeleteAccountView(LoginRequiredMixin, FormView):
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy("login")
     form_class = DeleteProfileForm
-    template_name = 'WeatherLookup/profile_delete.html'
+    template_name = "WeatherLookup/profile_delete.html"
 
     def form_valid(self, form):
         user = self.request.user
         user.is_active = False
         user.save()
-        messages.success(self.request, 'Profile successfully disabled.')
-        return redirect(reverse_lazy('index'))
+        messages.success(self.request, "Profile successfully disabled.")
+        return redirect(reverse_lazy("index"))

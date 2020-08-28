@@ -8,7 +8,5 @@ def unix_to_datetime(unix_date):
     :param unix_date: date presented in unix format
     :return: date in YYYY-mm-dd format
     """
-    date = datetime.datetime.utcfromtimestamp(unix_date).strftime('%Y-%m-%d')
+    date = datetime.datetime.utcfromtimestamp(unix_date).strftime("%Y-%m-%d")
     return date
-
-
