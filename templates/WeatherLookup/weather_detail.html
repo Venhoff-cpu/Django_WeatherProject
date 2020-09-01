@@ -52,6 +52,9 @@
         {% endif %}
         </div>
     </div>
-    <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
+    <div>
+        <img src="data:image/png;base64,{{ graph|safe }}"><br>
+    </div>
+    <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a><br>
 </div>
 {% endblock %}

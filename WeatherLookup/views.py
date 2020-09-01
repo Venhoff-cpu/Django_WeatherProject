@@ -8,6 +8,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
+from .utils import temperature_plot
 from .models import City
 from .forms import (
     CityForm,
@@ -19,6 +20,8 @@ from .forms import (
 from .api_processor import (
     api_current_ctx_processor,
     api_forecast_processor,
+    api_hourly_processor,
+    df_creation,
     fetch_current_data,
     fetch_forecast_data,
     get_city_name,
@@ -58,9 +61,16 @@ class WeatherDetail(TemplateView):
 
     def get_context_data(self, **kwargs):
         city_id = kwargs["city_id"]
-        data = fetch_current_data(city_id)
-        if data:
-            ctx = api_current_ctx_processor(data)
+        data_cur = fetch_current_data(city_id)
+
+        if data_cur:
+            lon = data_cur["coord"]["lon"]
+            lat = data_cur["coord"]["lat"]
+            json_data_hourly = fetch_forecast_data(lat, lon)
+            data_hourly = api_hourly_processor(json_data_hourly)
+            temperature_graph = temperature_plot(data_hourly)
+            ctx = api_current_ctx_processor(data_cur)
+            ctx['graph'] = temperature_graph
         return ctx
 
 
@@ -76,8 +86,9 @@ class WeatherForcast(TemplateView):
         data = fetch_forecast_data(lat, lon)
         if data:
             city_name = get_city_name(temp_data)
+            forecast_data = api_forecast_processor(data)
             ctx["city"] = city_name
-            ctx["table"] = api_forecast_processor(data).to_html(
+            ctx["table"] = df_creation(forecast_data).to_html(
                 index=False, classes="table"
             )
         return ctx

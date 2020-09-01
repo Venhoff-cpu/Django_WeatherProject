@@ -1,6 +1,6 @@
 import requests
 import collections
-from .utils import unix_to_datetime
+from .utils import unix_to_datetime, unix_to_datetime_hour
 from Django_WeatherProject.local_settings import api_key
 import pandas as pd
 
@@ -16,10 +16,9 @@ api_forecast_url_id = (
 )
 
 
-# oneshot api call takes parameters longtitude(lon) and latitude(lat) - used for 5 day forecast
+# oneshot api call takes parameters longtitude(lon) and latitude(lat) - used for 5 day forecast and hourly forcast
 forecast_api_url = (
-    "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&units=metric&lang=en&"
-    "exclude=current,minutely,hourly&appid={}"
+    "https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&units=metric&exclude=current,minutely&appid={}"
 )
 
 
@@ -40,7 +39,7 @@ def fetch_forecast_data(lat, lon):
 def api_current_ctx_processor(data):
     """
     Extraction of json data - current weather
-    :param data: API response from OpeanWeathermap.org in json fomat
+    :param data: API response from OpeanWeathermap.org in json format
     :return: Dictionary of lists
     """
     ctx = {}
@@ -73,8 +72,8 @@ def api_current_ctx_processor(data):
 
 def api_forecast_processor(data):
     """
-    Extraction of json data
-    :param data: API response from OpeanWeathermap.org in json fomat
+    Extraction of json data - 5 day forecast
+    :param data: API response from OpeanWeathermap.org in json format
     :return: Dictionary of lists
     """
     ctx = collections.defaultdict(list)
@@ -99,6 +98,15 @@ def api_forecast_processor(data):
         else:
             ctx["snowfall"].append(0)
 
+    return ctx
+
+
+def df_creation(ctx):
+    """
+
+    :param ctx: context - dictionary of lists
+    :return: Pandas dataframe
+    """
     df_ctx = pd.DataFrame()
     df_ctx["date"] = ctx["date"]
     df_ctx["temp_day"] = ctx["temp_day"]
@@ -114,6 +122,21 @@ def api_forecast_processor(data):
     df_ctx["Snowfall"] = ctx["snowfall"]
 
     return df_ctx
+
+
+def api_hourly_processor(data):
+    """
+    Extraction of json data - Only hourly temperature 48h
+    :param data: API response from OpeanWeathermap.org in json format
+    :return: dict of lists
+    """
+    ctx = collections.defaultdict(list)
+    for forecast in data["hourly"]:
+        date = unix_to_datetime_hour(forecast["dt"])
+        ctx["date"].append(date)
+        ctx["temp"].append(forecast["temp"])
+
+    return ctx
 
 
 def get_city_name(data):

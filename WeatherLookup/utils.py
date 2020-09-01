@@ -1,12 +1,52 @@
 import datetime
-import pandas as pd
+from matplotlib import pyplot as plt
+from io import BytesIO
+import base64
 
 
 def unix_to_datetime(unix_date):
     """
-    unction for converting unix date format into datetime format
+    function for converting unix date format into datetime format
     :param unix_date: date presented in unix format
     :return: date in YYYY-mm-dd format
     """
     date = datetime.datetime.utcfromtimestamp(unix_date).strftime("%Y-%m-%d")
     return date
+
+
+def unix_to_datetime_hour(unix_date):
+    """
+    function for converting unix date format into datetime format
+    :param unix_date: date presented in unix format
+    :return: date in dd-mm format
+    """
+    date = datetime.datetime.utcfromtimestamp(unix_date).strftime("%d-%m %H:%M")
+    return date
+
+
+def temperature_plot(api_data):
+    date_x = api_data['date']
+    temp_y = api_data['temp']
+    print(temp_y)
+    fig = plt.figure(figsize=(12, 4))
+    axes = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+    plt.style.use('ggplot')
+    axes.plot(date_x, temp_y, color='r', linewidth=2)
+    plt.xlabel('Date and hour')
+    plt.xticks(rotation=45)
+    plt.locator_params(axis='x', nbins=4)
+    plt.ylabel('Temperature (C)')
+    plt.title('Hourly temperature forcast (48h)')
+    plt.tight_layout()
+    plt.grid(True)
+
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches="tight")
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+
+    return graphic
