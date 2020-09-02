@@ -9,6 +9,7 @@
                 <div class="column is-offset-4 is-4">
                     <form method="POST" action="">
                         {% csrf_token %}
+                        <h4>Please type the city name (in english):</h4>
                         <div class="field has-addons">
                             {{ form.name }}
                             <button type="submit" class="button is-info">
