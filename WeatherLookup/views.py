@@ -89,8 +89,11 @@ class WeatherForcast(TemplateView):
             forecast_data = api_forecast_processor(data)
             ctx["city"] = city_name
             ctx["table"] = df_creation(forecast_data).to_html(
-                index=False, classes="table"
+                index=False,
+                classes="table",
             )
+        else:
+            messages.error(self.request, "No forecast for specified location.")
         return ctx
 
 
@@ -109,7 +112,7 @@ class AddToFavorite(LoginRequiredMixin, View):
         )
         if created:
             city.save()
-            messages.error(request, f"{city} added to observed")
+            messages.success(request, f"{city} added to observed")
         else:
             messages.error(request, f"{city} already observed")
             return redirect(reverse_lazy("index"))
@@ -122,6 +125,7 @@ class DeleteFromFav(LoginRequiredMixin, View):
     def post(self, request, city_id):
         city = get_object_or_404(City, city_id=city_id, user=request.user.id)
         city.delete()
+        messages.success(request, f"{city} deleted from observed")
         return redirect(reverse_lazy("profile"))
 
 
@@ -132,6 +136,7 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         form.save()
+        messages.success(self.request, f"Signing successful. You can now login.")
         return super().form_valid(form)
 
 
