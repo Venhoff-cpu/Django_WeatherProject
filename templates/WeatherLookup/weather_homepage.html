@@ -1,8 +1,12 @@
 {%  extends 'WeatherLookup/base.html' %}
+{% load static %}
 
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
+
+    <div id="map-canvas"></div>
+
     <section class="section">
         <div class="container">
             <div class="columns">
@@ -67,4 +71,10 @@
         </div>
     </section>
     {% endif %}
+{% endblock %}
+{% block script %}
+    <!-- Google map JS script -->
+    <script async defer type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEvQDlkulKnf_G4qWSguMJqlrPHcOSVgQ">
+    </script>
+    <script src="{% static 'google_map.js' %}"></script>
 {% endblock %}
