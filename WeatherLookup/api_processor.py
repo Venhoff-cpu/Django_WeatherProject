@@ -22,6 +22,34 @@ forecast_api_url = (
 )
 
 
+def get_wind_direction(degree):
+    """
+    Convert wind degree to direction.
+    :param degree: degree of the wind (float).
+    :return direction of the wind (N, NNE, NE, etc) in str.
+    """
+    DEGREES = [-11.25, 11.25, 33.75, 56.25,
+               78.75, 101.25, 123.75, 146.25,
+               168.75, 191.25, 213.75, 236.25,
+               258.75, 281.25, 303.75, 326.25, 348.75]
+
+    DIRECTIONS = ['N', 'NNE', 'NE', 'ENE',
+                  'E', 'ESE', 'SE', 'SSE',
+                  'S', 'SSW', 'SW', 'WSW',
+                  'W', 'WNW', 'NW', 'NNW']
+
+    # Correction for North wind.
+    if degree > 348.75:
+        degree -= 360
+
+    for i in range(len(DIRECTIONS)):
+        left_border = DEGREES[i]
+        right_border = DEGREES[i + 1]
+
+        if left_border < degree <= right_border:
+            return DIRECTIONS[i]
+
+
 def fetch_current_data(city):
     if isinstance(city, str):
         response = requests.get(api_current_url.format(city, api_key)).json()
@@ -40,7 +68,7 @@ def api_current_ctx_processor(data):
     """
     Extraction of json data - current weather
     :param data: API response from OpeanWeathermap.org in json format
-    :return: Dictionary of lists
+    :return Dictionary of lists
     """
     ctx = {}
     ctx["city_name"] = data["name"]
@@ -52,7 +80,7 @@ def api_current_ctx_processor(data):
     ctx["pressure"] = data["main"]["pressure"]
     ctx["humidity"] = data["main"]["humidity"]  # presented in %
     ctx["wind_speed"] = data["wind"]["speed"]
-    ctx["wind_deg"] = data["wind"]["deg"]
+    ctx["wind_deg"] = get_wind_direction(data["wind"]["deg"])
     ctx["clouds"] = data["clouds"]["all"]  # presented in %
     if "rain" in data:
         ctx["rain_1h"] = data["rain"]["1h"]
@@ -87,7 +115,7 @@ def api_forecast_processor(data):
         ctx["weather_description"].append(forecast["weather"][0]["description"])
         ctx["clouds"].append(forecast["clouds"])
         ctx["wind_speed_prediction"].append(forecast["wind_speed"])
-        ctx["wind_degree_prediction"].append(forecast["wind_deg"])
+        ctx["wind_degree_prediction"].append(get_wind_direction(forecast["wind_deg"]))
         ctx["pop_chance"].append(forecast["pop"])
         if "rain" in forecast:
             ctx["rainfall"].append(forecast["rain"])
@@ -103,7 +131,7 @@ def api_forecast_processor(data):
 
 def df_creation(ctx):
     """
-
+    Creating dataframe of forecast
     :param ctx: context - dictionary of lists
     :return: Pandas dataframe
     """
