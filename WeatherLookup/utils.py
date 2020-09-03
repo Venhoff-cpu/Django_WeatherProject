@@ -18,13 +18,26 @@ def unix_to_datetime_hour(unix_date):
     """
     function for converting unix date format into datetime format
     :param unix_date: date presented in unix format
-    :return: date in dd-mm format
+    :return: date in dd-mm HH:MM format
     """
     date = datetime.datetime.utcfromtimestamp(unix_date).strftime("%d-%m %H:%M")
     return date
 
 
-def temperature_plot(api_data):
+def get_plot_img(chart):
+    buffer = BytesIO()
+    chart.savefig(buffer, format='png', bbox_inches="tight")
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+
+    return graphic
+
+
+def hourly_temperature_plot(api_data):
     date_x = api_data['date']
     temp_y = api_data['temp']
     print(temp_y)
@@ -40,13 +53,25 @@ def temperature_plot(api_data):
     plt.tight_layout()
     plt.grid(True)
 
-    buffer = BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches="tight")
-    buffer.seek(0)
-    image_png = buffer.getvalue()
-    buffer.close()
+    graphic = get_plot_img(plt)
 
-    graphic = base64.b64encode(image_png)
-    graphic = graphic.decode('utf-8')
+    return graphic
+
+
+def forecast_temperature_plot(df):
+    # get current axis
+    axis = plt.gca()
+
+    df.plot(kind='line', x='date', y='temp_day', color='red', ax=axis)
+    df.plot(kind='line', x='date', y='temp_night', color='blue', ax=axis)
+
+    plt.xlabel('Date')
+    plt.xticks(rotation=45)
+    plt.ylabel('Temperature (C)')
+    plt.title('Forecasted temperature')
+    plt.tight_layout()
+    plt.grid(True)
+
+    graphic = get_plot_img(plt)
 
     return graphic

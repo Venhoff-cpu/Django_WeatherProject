@@ -129,7 +129,7 @@ def api_forecast_processor(data):
     return ctx
 
 
-def df_creation(ctx):
+def get_df_forecast(ctx):
     """
     Creating dataframe of forecast
     :param ctx: context - dictionary of lists
@@ -152,7 +152,7 @@ def df_creation(ctx):
     return df_ctx
 
 
-def api_hourly_processor(data):
+def get_hourly_temperature(data):
     """
     Extraction of json data - Only hourly temperature 48h
     :param data: API response from OpeanWeathermap.org in json format

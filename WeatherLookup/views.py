@@ -8,7 +8,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
-from .utils import temperature_plot
+from .utils import hourly_temperature_plot, forecast_temperature_plot
 from .models import City
 from .forms import (
     CityForm,
@@ -20,8 +20,8 @@ from .forms import (
 from .api_processor import (
     api_current_ctx_processor,
     api_forecast_processor,
-    api_hourly_processor,
-    df_creation,
+    get_hourly_temperature,
+    get_df_forecast,
     fetch_current_data,
     fetch_forecast_data,
     get_city_name,
@@ -67,8 +67,8 @@ class WeatherDetail(TemplateView):
             lon = data_cur["coord"]["lon"]
             lat = data_cur["coord"]["lat"]
             json_data_hourly = fetch_forecast_data(lat, lon)
-            data_hourly = api_hourly_processor(json_data_hourly)
-            temperature_graph = temperature_plot(data_hourly)
+            data_hourly = get_hourly_temperature(json_data_hourly)
+            temperature_graph = hourly_temperature_plot(data_hourly)
             ctx = api_current_ctx_processor(data_cur)
             ctx['graph'] = temperature_graph
         return ctx
@@ -87,11 +87,13 @@ class WeatherForcast(TemplateView):
         if data:
             city_name = get_city_name(temp_data)
             forecast_data = api_forecast_processor(data)
+            df = get_df_forecast(forecast_data)
             ctx["city"] = city_name
-            ctx["table"] = df_creation(forecast_data).to_html(
+            ctx["table"] = df.to_html(
                 index=False,
                 classes="table",
             )
+            ctx["graph"] = forecast_temperature_plot(df)
         else:
             messages.error(self.request, "No forecast for specified location.")
         return ctx

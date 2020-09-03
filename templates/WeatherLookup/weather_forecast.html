@@ -5,4 +5,7 @@
 {% block content %}
     <h2>5 day forcast - {{ city }}</h2>
     {{ table|safe }}
+    <div>
+        <img src="data:image/png;base64,{{ graph|safe }}"><br>
+    </div>
 {% endblock %}
