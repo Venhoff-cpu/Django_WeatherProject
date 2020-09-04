@@ -56,13 +56,15 @@ def hourly_temperature_plot(api_data):
     plt.grid(True)
 
     graphic = get_plot_img(plt)
+    plt.close(fig)
 
     return graphic
 
 
 def forecast_temperature_plot(df):
+    fig = plt.figure(figsize=(12, 4))
     # get current axis
-    axis = plt.gca()
+    axis = fig.gca()
 
     df.plot(kind='line', x='date', y='temp_day', color='red', ax=axis)
     df.plot(kind='line', x='date', y='temp_night', color='blue', ax=axis)
@@ -71,9 +73,33 @@ def forecast_temperature_plot(df):
     plt.xticks(rotation=45)
     plt.ylabel('Temperature (C)')
     plt.title('Forecasted temperature')
-
     plt.grid(True)
 
     graphic = get_plot_img(plt)
+    plt.close(fig)
+
+    return graphic
+
+
+def forecast_precipitation_plot(df):
+    fig = plt.figure(figsize=(12, 4))
+    # get current axis
+    axis = fig.gca()
+
+    df.plot(kind='bar', x='date', y='Rainfall', color='blue', ax=axis)
+    df.plot(kind='bar', x='date', y='Snowfall', color='grey', ax=axis)
+    ax3 = df['Chance of precipitation'].plot(secondary_y=True, color='r', x='date', linewidth=2, ax=axis)
+
+    axis.set_xlabel('Date')
+    xlabels = axis.get_xticklabels()
+    axis.set_xticklabels(xlabels, rotation=45)
+
+    axis.set_ylabel('Participation [mm/day/m2]')
+    ax3.set_ylabel('Chance of Participation [%]')
+    plt.title('Forecasted Participation')
+    plt.grid(True)
+
+    graphic = get_plot_img(plt)
+    plt.close(fig)
 
     return graphic

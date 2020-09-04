@@ -8,7 +8,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
-from .utils import hourly_temperature_plot, forecast_temperature_plot
+from .utils import hourly_temperature_plot, forecast_temperature_plot, forecast_precipitation_plot
 from .models import City
 from .forms import (
     CityForm,
@@ -44,7 +44,6 @@ class WeatherCurrent(FormView):
         ctx = {}
         city = form.cleaned_data.get("name")
         data = fetch_current_data(city)
-        print(data)
         if data['cod'] == '404':
             messages.info(self.request, "Incorrect city name. Try again")
         else:
@@ -82,10 +81,13 @@ class WeatherForcast(TemplateView):
         ctx = {}
         city_id = kwargs["city_id"]
         temp_data = fetch_current_data(city_id)
-        lon = temp_data["coord"]["lon"]
-        lat = temp_data["coord"]["lat"]
-        data = fetch_forecast_data(lat, lon)
-        if data:
+        if temp_data['cod'] == '404':
+            messages.error(self.request, "No forecast for specified location.")
+        else:
+            lon = temp_data["coord"]["lon"]
+            lat = temp_data["coord"]["lat"]
+            data = fetch_forecast_data(lat, lon)
+
             city_name = get_city_name(temp_data)
             forecast_data = api_forecast_processor(data)
             df = get_df_forecast(forecast_data)
@@ -94,9 +96,7 @@ class WeatherForcast(TemplateView):
                 index=False,
                 classes="table",
             )
-            ctx["graph"] = forecast_temperature_plot(df)
-        else:
-            messages.error(self.request, "No forecast for specified location.")
+            ctx["graphs"] = [forecast_temperature_plot(df), forecast_precipitation_plot(df)]
         return ctx
 
 
@@ -128,7 +128,7 @@ class DeleteFromFav(LoginRequiredMixin, View):
     def post(self, request, city_id):
         city = get_object_or_404(City, city_id=city_id, user=request.user.id)
         city.delete()
-        messages.success(request, f"{city} deleted from observed")
+        messages.success(request, f"{city} deleted from observed.")
         return redirect(reverse_lazy("profile"))
 
 
@@ -139,7 +139,7 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         form.save()
-        messages.success(self.request, f"Signing successful. You can now login.")
+        messages.success(self.request, f"Signing in successful. You can now login.")
         return super().form_valid(form)
 
 

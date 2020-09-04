@@ -5,11 +5,13 @@
 {% block content %}
     <section class="section">
         <div class="container">
-            <h2>5 day forcast - {{ city }}</h2>
+            <h2>7 day forcast - {{ city }}</h2>
             {{ table|safe }}
+            {% for graph in graphs %}
             <figure class="figure-img">
                 <img src="data:image/png;base64,{{ graph|safe }}" class="img-fluid">
             </figure>
+            {% endfor %}
         </div>
     </section>
 {% endblock %}
