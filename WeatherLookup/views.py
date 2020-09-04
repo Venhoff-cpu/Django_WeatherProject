@@ -44,10 +44,11 @@ class WeatherCurrent(FormView):
         ctx = {}
         city = form.cleaned_data.get("name")
         data = fetch_current_data(city)
-        if data:
-            ctx = api_current_ctx_processor(data)
-        else:
+        print(data)
+        if data['cod'] == '404':
             messages.info(self.request, "Incorrect city name. Try again")
+        else:
+            ctx = api_current_ctx_processor(data)
         user = self.request.user
         if not user.is_anonymous:
             fav_cities = [city.name for city in City.objects.filter(user=user)]

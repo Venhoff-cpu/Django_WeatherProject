@@ -3,50 +3,37 @@
 {% block title %}{{ user.username }} hub{% endblock %}
 
 {% block content %}
-    <div class="container">
     {% if user.is_authenticated %}
-        <h4>Welcome to your hub '{{ user.username }}'</h4>
+        <h4>Welcome to your hub '{{ user.username }}'</h4
         <section class="section">
+        {% if cities %}
+            <h5>Your observed cities:</h5>
+            {% for city in cities %}
             <div class="container">
-                <div class="columns">
-                    <div class="column is-offset-4 is-4">
-                    {% if cities %}
-                        {% for city in cities %}
-                        <div class="box">
-                            <article class="media">
-                                <div class="media-left">
-                                    <figure class="image is-50x50">
-                                        <img src="http://openweathermap.org/img/w/{{ city.icon }}.png" alt="Image">
-                                    </figure>
-                                </div>
-                                <div class="media-content">
-                                    <div class="content">
-                                        <p>
-                                            <span class="title">{{ city.name }}</span>
-                                            <br>
-                                            <span class="subtitle">{{ city.temperature }}° C</span>
-                                            <br>
-                                            <span>{{ city.description }}</span>
-                                            <a href="{% url 'weather_detail' city.city_id %}">Details</a>
-                                            <a href="{% url 'weather_forecast' city.city_id %}">5 day forecast</a>
-                                            <form method="POST" action="{% url 'del_fav' city.city_id %}">
-                                                {% csrf_token %}
-                                                <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Delete">
-                                            </form>
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
+                <div class="row mb-2">
+                    <div class="w-50 mx-auto d-flex-inline border border-success rounded bg-light justify-content-center p-2">
+                        <div class="row mx-auto">
+                            <figure class="figure-img">
+                                <img src="http://openweathermap.org/img/w/{{ city.icon }}.png" class="img-fluid">
+                            </figure>
+                            <h4 class="align-self-center">{{ city.city_name }}</h4>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div>
-                        No observed cities.
-                        </div>
-                    {% endif %}
+                        <span>Temp.:{{ city.temperature }}°C - </span>
+                        <span>Weather: {{ city.description }}</span><br>
+                        <a href="{% url 'weather_detail' city.city_id %}">More details</a><br>
+                        <a href="{% url 'weather_forecast' city.city_id %}">5 day forecast</a>
+                        <form method="POST" action="{% url 'del_fav' city.city_id %}">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-outline-danger my-2 my-sm-0"
+                               value="Delete from observed">
+                        </form>
                     </div>
                 </div>
             </div>
+            {% endfor %}
+        {% else %}
+            <p>No observed cities</p>
+        {% endif %}
         </section>
     {% else %}
         <p>Sorry, you have to be logged in to view this page -
@@ -56,5 +43,5 @@
             <a href="{% url 'register' %}">signing up.</a>
         </p>
     {% endif %}
-    </div>
 {% endblock %}
+

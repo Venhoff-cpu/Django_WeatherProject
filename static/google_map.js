@@ -15,10 +15,10 @@ function initialize() {
     map = new google.maps.Map(document.getElementById('map-canvas'),
         mapOptions);
     // Add interaction listeners to make weather requests
-    google.maps.event.addListener(map, 'idle', checkIfDataRequested);
+    google.maps.event.addEventListener(map, 'idle', checkIfDataRequested);
 
     // Sets up and populates the info window with details
-    map.data.addListener('click', function(event) {
+    map.data.addEventListener('click', function(event) {
         infowindow.setContent(
             "<img src=" + event.feature.getProperty("icon") + ">"
             + "<br /><strong>" + event.feature.getProperty("city") + "</strong>"

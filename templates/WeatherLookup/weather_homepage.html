@@ -4,77 +4,61 @@
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-
     <div id="map-canvas"></div>
 
     <section class="section">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-offset-4 is-4">
-                    <form method="POST" action="">
-                        {% csrf_token %}
-                        <h4>Please type the city name (in english):</h4>
-                        <div class="field has-addons">
-                            {{ form.name }}
-                            <button type="submit" class="button is-info">
-                                    Find a city
-                            </button>
-                        </div>
-                    </form>
+        <div class="container d-flex">
+            <h4>Type the city name (in english): </h4>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="form-group justify-content-center">
+                    {{ form.name }}
+                    <button type="submit" class="btn btn-primary">
+                        Find a city
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </section>
     {% if city_name %}
     <section class="section">
         <div class="container">
-            <div class="columns">
-                <div class="column is-offset-4 is-4">
-                    <div class="box">
-                        <article class="media">
-                            <div class="media-left">
-                                <figure class="image is-50x50">
-                                    <img src="http://openweathermap.org/img/w/{{ icon }}.png" alt="Image">
-                                </figure>
-                            </div>
-                            <div class="media-content">
-                                <div class="content">
-                                    <p>
-                                        <span class="title">{{ city_name }}</span>
-                                        <br>
-                                        <span class="subtitle">{{ temperature }}° C</span>
-                                        <br>
-                                        <span>{{ description }}</span><br>
-                                        <a href="{% url 'weather_detail' city_id=city_id %}">Details</a><br>
-                                        <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
-                                        {% if user.is_authenticated %}
-                                            {% if city_name in fav_cities %}
-                                                <form method="POST" action="{% url 'del_fav' city_id=city_id %}">
-                                                    {% csrf_token %}
-                                                    <input type="submit" class="btn btn-outline-danger my-2 my-sm-0"
-                                                           value="Delete from observed">
-                                                </form>
-                                            {% else %}
-                                                <form method="POST" action="{% url 'add_fav' city_id=city_id %}">
-                                                {% csrf_token %}
-                                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Observe</button>
-                                                </form>
-                                            {% endif %}
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        </article>
+           <div class="row mb-2">
+               <div class="w-50 mx-auto d-flex-inline border border-success rounded bg-light justify-content-center p-2">
+                    <div class="row mx-auto">
+                        <figure class="figure-img">
+                            <img src="http://openweathermap.org/img/w/{{ icon }}.png" class="img-fluid">
+                        </figure>
+                        <h4 class="align-self-center">{{ city_name }}</h4>
                     </div>
-                </div>
-            </div>
+
+                   <span>Temp.:{{ temperature }}°C - </span>
+                   <span>Weather: {{ description }}</span><br>
+                   <a href="{% url 'weather_detail' city_id=city_id %}">More details</a><br>
+                   <a href="{% url 'weather_forecast' city_id=city_id %}">5 day forecast</a>
+                   {% if user.is_authenticated %}
+                       {% if city_name in fav_cities %}
+                           <form method="POST" action="{% url 'del_fav' city_id=city_id %}">
+                               {% csrf_token %}
+                               <input type="submit" class="btn btn-outline-danger my-2 my-sm-0"
+                                      value="Delete from observed">
+                           </form>
+                       {% else %}
+                           <form method="POST" action="{% url 'add_fav' city_id=city_id %}">
+                               {% csrf_token %}
+                               <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Observe</button>
+                           </form>
+                       {% endif %}
+                   {% endif %}
+               </div>
+           </div>
         </div>
     </section>
     {% endif %}
 {% endblock %}
 {% block script %}
     <!-- Google map JS script -->
-    <script async defer type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEvQDlkulKnf_G4qWSguMJqlrPHcOSVgQ">
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEvQDlkulKnf_G4qWSguMJqlrPHcOSVgQ">
     </script>
     <script src="{% static 'google_map.js' %}"></script>
 {% endblock %}

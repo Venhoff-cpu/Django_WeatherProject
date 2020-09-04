@@ -1,7 +1,25 @@
 {%  extends 'WeatherLookup/base.html' %}
 
-{% block title %}About{% endblock %}
+{% block title %}About app{% endblock %}
 
 {% block content %}
-    <p>About me</p>
+    <section class="section">
+        <div clas="container">
+            <div class="row mx-4">
+                <h4>About application</h4>
+            </div>
+            <div class="row mx-4">
+                <p>Django project to show current weather and 5 day forecast in the city.</p>
+                <p>Project uses OpenWeatherMap API for gathering current and forecast weather data.</p><br>
+            </div>
+            <div class="row mx-4">
+                <p>The following technologies were used in the project</p>
+            </div>
+            <ul>
+                <li>Django 3.0</li>
+                <li>Python 3.6 - including Pandas, NumPy, MatPlotLib</li>
+                <li>Bootstrap 4 (CSS, JS)</li>
+            </ul>
+        </div>
+    </section>
 {% endblock %}

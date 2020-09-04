@@ -62,11 +62,13 @@
     </ul>
     {% endif %}
     {% block content %}{% endblock %}
-    <footer class="footer" style="display: flex">
-        <p>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</p>
-        <p>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}.</p>
-        Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>.
-        Github: <a href="https://github.com/Venhoff-cpu">link</a>.
+    <footer class="footer">
+        <div class="container">
+            <span>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</span>
+            <span>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}.</span>
+            Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>.
+            Github: <a href="https://github.com/Venhoff-cpu">link</a>.
+        </div>
     </footer>
     <!-- Optional JavaScript -->
     {% block script %}{% endblock %}

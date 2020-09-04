@@ -40,14 +40,16 @@ def get_plot_img(chart):
 def hourly_temperature_plot(api_data):
     date_x = api_data['date']
     temp_y = api_data['temp']
-    print(temp_y)
+
     fig = plt.figure(figsize=(12, 4))
     axes = fig.add_axes([0.1, 0.1, 0.8, 0.8])
     plt.style.use('ggplot')
     axes.plot(date_x, temp_y, color='r', linewidth=2)
+
     plt.xlabel('Date and hour')
     plt.xticks(rotation=45)
     plt.locator_params(axis='x', nbins=4)
+
     plt.ylabel('Temperature (C)')
     plt.title('Hourly temperature forcast (48h)')
     plt.tight_layout()
