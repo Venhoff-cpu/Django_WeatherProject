@@ -71,7 +71,7 @@ def forecast_temperature_plot(df):
     plt.xticks(rotation=45)
     plt.ylabel('Temperature (C)')
     plt.title('Forecasted temperature')
-    plt.tight_layout()
+
     plt.grid(True)
 
     graphic = get_plot_img(plt)
