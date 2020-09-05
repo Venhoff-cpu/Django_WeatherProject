@@ -52,7 +52,6 @@ def hourly_temperature_plot(api_data):
 
     plt.ylabel('Temperature (C)')
     plt.title('Hourly temperature forcast (48h)')
-    plt.tight_layout()
     plt.grid(True)
 
     graphic = get_plot_img(plt)

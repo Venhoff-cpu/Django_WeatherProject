@@ -21,9 +21,9 @@ from .views import (
 
 urlpatterns = [
     path("", WeatherCurrent.as_view(), name="index"),
-    path("weather/register/", RegisterView.as_view(), name="register"),
-    path("weeather/login/", LoginView.as_view(), name="login"),
-    path("weether/logout/", LogoutView.as_view(), name="logout"),
+    path("weather/register", RegisterView.as_view(), name="register"),
+    path("weeather/login", LoginView.as_view(), name="login"),
+    path("weether/logout", LogoutView.as_view(), name="logout"),
     path("weather/profile/hub", ProfileView.as_view(), name="profile"),
     path("weather/profile/detail", ProfileDetailView.as_view(), name="profile_detail"),
     path(
