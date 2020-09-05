@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.views.generic.base import ContextMixin
 
 from .utils import hourly_temperature_plot, forecast_temperature_plot, forecast_precipitation_plot
-from .models import City
+from .models import City, Favorite
 from .forms import (
     CityForm,
     CreateUserForm,
@@ -50,7 +50,7 @@ class WeatherCurrent(FormView):
             ctx = api_current_ctx_processor(data)
         user = self.request.user
         if not user.is_anonymous:
-            fav_cities = [city.name for city in City.objects.filter(user=user)]
+            fav_cities = [city.name for city in City.objects.filter(favorite__user=user.id)]
             ctx['fav_cities'] = fav_cities
         ctx['form'] = form
         return render(self.request, "WeatherLookup/weather_homepage.html", ctx)
@@ -111,14 +111,17 @@ class AddToFavorite(LoginRequiredMixin, View):
             city_id=city_data["id"],
             lon=city_data["coord"]["lon"],
             lat=city_data["coord"]["lat"],
-            user=user,
         )
         if created:
             city.save()
-            messages.success(request, f"{city} added to observed")
-        else:
+
+        elif user in city.favorite_set.all():
             messages.error(request, f"{city} already observed")
             return redirect(reverse_lazy("index"))
+
+        city.fav.add(user)
+        messages.success(request, f"{city} added to observed")
+
         return redirect(reverse_lazy("profile"))
 
 
@@ -126,9 +129,10 @@ class DeleteFromFav(LoginRequiredMixin, View):
     login_url = reverse_lazy("login")
 
     def post(self, request, city_id):
-        city = get_object_or_404(City, city_id=city_id, user=request.user.id)
-        city.delete()
-        messages.success(request, f"{city} deleted from observed.")
+        city = get_object_or_404(City, city_id=city_id)
+        fav = get_object_or_404(Favorite, city=city.id, user=request.user.id)
+        messages.success(request, f"{fav.city} deleted from observed.")
+        fav.delete()
         return redirect(reverse_lazy("profile"))
 
 
@@ -185,7 +189,7 @@ class ProfileView(ProfileMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data()
         user = get_object_or_404(User, pk=self.request.user.id)
-        cities_query = City.objects.filter(user=user.id)
+        cities_query = City.objects.filter(favorite__user=user.id)
         cities = []
         for city in cities_query:
             city_data = fetch_current_data(city.city_id)

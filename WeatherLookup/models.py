@@ -7,11 +7,18 @@ class City(models.Model):
     city_id = models.IntegerField()
     lon = models.IntegerField()
     lat = models.IntegerField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    fav = models.ManyToManyField(User, through='Favorite')
 
     def __str__(self):
         return self.name
 
     class Meta:
         verbose_name_plural = "cities"
-        unique_together = ("city_id", "user")
+
+
+class Favorite(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("city", "user")
