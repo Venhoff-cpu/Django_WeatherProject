@@ -62,14 +62,15 @@
     </ul>
     {% endif %}
     {% block content %}{% endblock %}
-    <div class="footer-content">
-        <span>Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.</span>
-        <span>This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}.</span>
-        Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>.
-        Github: <a href="https://github.com/Venhoff-cpu">link</a>.
-    </div>
-    <footer class="footer"></footer>
-
+    <footer class="footer mt-auto py-3">
+      <div class="container">
+        <span class="text-muted">Current date: {{ now|date:"d.m.Y" }} {{ now|time:"H:i" }}.
+            This application was prepared by Krzysztof Pacuszka on 2020. Version: {{ version }}.
+            Linkedin profile:<a href="https://www.linkedin.com/in/krzysztof-pacuszka/">link</a>.
+            Github: <a href="https://github.com/Venhoff-cpu">link</a>.
+        </span>
+      </div>
+    </footer>
     <!-- Optional JavaScript -->
     {% block script %}{% endblock %}
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
