@@ -5,10 +5,6 @@ main > .container {
 }
 
 .footer {
-  position: relative;
-  bottom: 0;
-  height: 60px;
-  width: 100%;
   background-color: #f5f5f5;
 }
 
