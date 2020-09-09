@@ -1,6 +1,6 @@
 import requests
 import collections
-from .utils import unix_to_datetime, unix_to_datetime_hour
+from WeatherLookup.utils import unix_to_datetime, unix_to_datetime_hour
 from Django_WeatherProject.local_settings import api_key
 import pandas as pd
 

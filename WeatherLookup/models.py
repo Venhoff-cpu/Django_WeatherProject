@@ -22,3 +22,44 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ("city", "user")
+
+
+class Stations(models.Model):
+    station_id = models.IntegerField(null=False, primary_key=True)
+    address_street = models.TextField()
+    city_commune_communeName = models.TextField()
+    city_commune_districtName = models.TextField()
+    city_commune_provinceName = models.TextField()
+    station_city_id = models.IntegerField()
+    city_name = models.CharField(max_length=128)
+    gegrLat = models.FloatField()
+    gegrLon = models.FloatField()
+    station_name = models.CharField(max_length=128)
+
+
+class Sensors(models.Model):
+    sensor_id = models.IntegerField(null=False, primary_key=True)
+    param_id = models.IntegerField()
+    param_code = models.CharField(max_length=8)
+    param_formula = models.CharField(max_length=256)
+    param_name = models.CharField(max_length=256)
+    station_id = models.ForeignKey(Stations, on_delete=models.CASCADE)
+
+
+class Readings(models.Model):
+    sensor_id = models.ForeignKey(Sensors, on_delete=models.CASCADE)
+    datetime = models.DateTimeField()
+    value = models.FloatField()
+
+    class Meta:
+        unique_together = (('sensor_id', 'datetime'),)
+
+
+class AirIndex(models.Model):
+    station_id = models.ForeignKey(Stations, on_delete=models.CASCADE)
+    index_date = models.DateTimeField()
+    index_levelID = models.IntegerField()
+    index_levelName = models.CharField(max_length=32)
+
+    class Meta:
+        unique_together = (('station_id', 'index_date'),)

@@ -17,7 +17,7 @@ from .forms import (
     ChangeProfileForm,
     DeleteProfileForm,
 )
-from .api_processor import (
+from WeatherLookup.api.owm_api_processor import (
     api_current_ctx_processor,
     api_forecast_processor,
     get_hourly_temperature,
