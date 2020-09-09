@@ -38,7 +38,7 @@ sk = 'yours_secret_key'
 # OWM API key
 api_key = "yours_OWM_api_key"
 ```
-Your OWM Api key you can get from here: [OpenWeatherMap](https://openweathermap.org/api).
+You can get OWM Api key from here: [OpenWeatherMap](https://openweathermap.org/api).
 You need to sign up to get the key.
 
 ## Status
