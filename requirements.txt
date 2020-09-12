@@ -28,3 +28,5 @@ toml==0.10.1
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
 urllib3==1.25.10
+
+celery~=4.4.7

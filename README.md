@@ -8,11 +8,12 @@ Django Training project showing:
 Essential:
 * Python 3.6
 * Django 3.1
-* pip
 * PostgreSQL9.5+
 * MatPlotLib 3.3.1
 * NumPy 1.19.1
 * Pandas 1.1.1
+* Celery 4.4.7
+* Redis 6.0.8
 
 ## Configuration 
 Look at **settings.py** file, you will find the following section in it:
@@ -44,7 +45,6 @@ You need to sign up to get the key.
 ## Status
 
 Currently working on Air quality part. TODO:
-- Prepare a periodic task for updating tables regarding Air quality (Stations, Sensors, Readings, AirIndex)
 - Views and templates update.
 
 

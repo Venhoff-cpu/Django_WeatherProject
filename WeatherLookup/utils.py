@@ -95,6 +95,7 @@ def forecast_precipitation_plot(df):
 
     axis.set_ylabel('Participation [mm/day/m2]')
     ax3.set_ylabel('Chance of Participation [%]')
+    ax3.set_ylim(0, 1)
     plt.title('Forecasted Participation')
     plt.grid(True)
 
