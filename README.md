@@ -5,25 +5,22 @@ Django Training project showing:
 
 ## Requirements
 
-Essential:
-* Python 3.6
-* Django 3.1
-* PostgreSQL9.5+
-* MatPlotLib 3.3.1
-* NumPy 1.19.1
-* Pandas 1.1.1
-* Celery 4.4.7
-* Redis 6.0.8
+To install all nesccesery iteams use following command line in terminal
+while your virtual enviroment for this project is active:
+```python
+$ pip install -r requirements.txt
+```
 
 ## Configuration 
+### Database and OWM api
 Look at **settings.py** file, you will find the following section in it:
 
 ```python
 try:
     from your.local_settings import DATABASES
 except ModuleNotFoundError:
-    print("Brak konfiguracji bazy danych w pliku local_settings.py!")
-    print("Uzupełnij dane i spróbuj ponownie!")
+    print("No database configuration in local_settings.py!")
+    print("Fill in the data and try again!")
     exit(0)
 ```
 
@@ -42,9 +39,35 @@ api_key = "yours_OWM_api_key"
 You can get OWM Api key from here: [OpenWeatherMap](https://openweathermap.org/api).
 You need to sign up to get the key.
 
+### GIOŚ API
+
+The GIOŚ API along with all current readings is available for public viewing according to the principle of access to 
+environmental information for the public.
+
+More information about API: [https://powietrze.gios.gov.pl/pjp/content/api](https://powietrze.gios.gov.pl/pjp/content/api)
+
+### Celery - asynchronous task queue
+
+In the project Celery was used to update air quality data. 
+Redis was used as a broker.
+
+By default, the update is to take place every hour, 10 minutes after a full hour 
+i.e. 15:10, 16:10, 17:10 etc. You can change the frequency of the task by changing the 
+**'schedule'** key in **settings.py** into **CELERY_BEAT_SCHEDULE**.
+```python
+CELERY_BEAT_SCHEDULE = {
+    'update_db': {
+        'task': 'WeatherLookup.tasks.update_air_quality_db',
+        'schedule': crontab(minute='10', hour='*/1'),
+    },
+}
+```
+
+It is not recommended to run a task every full hour - every full hour there is an update of the readings on the side 
+of the Chief Inspectorate, so the obtained data may be incomplete (some sensors have n readings and some n+1).
+
 ## Status
 
 Currently working on Air quality part. TODO:
 - Views and templates update.
-
-
+- Map GIOS stations with OWM cities.

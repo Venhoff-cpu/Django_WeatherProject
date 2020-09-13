@@ -121,11 +121,11 @@ STATICFILES_DIRS = [
 try:
     from Django_WeatherProject.local_settings import DATABASES
 except ModuleNotFoundError:
-    print("Brak konfiguracji bazy danych w pliku local_settings.py!")
-    print("Uzupełnij dane i spróbuj ponownie!")
+    print("No database configuration in local_settings.py!")
+    print("Fill in the data and try again!")
     exit(0)
 
-# CELERY STUFF
+# CELERY SETTINGS
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -135,6 +135,6 @@ CELERY_TIMEZONE = 'Europe/Warsaw'
 CELERY_BEAT_SCHEDULE = {
     'update_db': {
         'task': 'WeatherLookup.tasks.update_air_quality_db',
-        'schedule': crontab(minute='15', hour='*/1'),
+        'schedule': crontab(minute='10', hour='*/1'),
     },
 }
